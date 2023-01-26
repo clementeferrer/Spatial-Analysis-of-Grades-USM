@@ -771,17 +771,28 @@ gadm_valp_com$NAME_3[26] <- "LLAY LLAY"
 
 col_aux <- rep(NA,length(gadm_valp_com$NAME_3))
 
-prom_com_valp <- data.frame(gadm_valp_com$NAME_3, col_aux, col_aux, col_aux, col_aux, col_aux,
-                            col_aux, col_aux, col_aux, col_aux)
-names(prom_com_valp) <- c("Comuna", "FIS110", "IWI131", "MAT021", "MAT022","QUI010",
+prom_com_valp <- data.frame(gadm_valp_com$NAME_3, col_aux, col_aux, col_aux, col_aux, col_aux, col_aux, col_aux, col_aux, col_aux, col_aux)
+names(prom_com_valp) <- c("Comuna", "FIS100","FIS110", "IWI131", "MAT021", "MAT022","QUI010",
                           "IDP", "IDC", "RCP", "PPC")
 
 for (i in 1:length(indices$Comuna)){
+  FIS100 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$FIS100, na.rm = TRUE)
+  FIS110 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$FIS110, na.rm = TRUE)
+  IWI131 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$IWI131, na.rm = TRUE)
+  MAT021 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$MAT021, na.rm = TRUE)
+  MAT022 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$MAT022, na.rm = TRUE)
+  QUI010 <- mean(subset(df2017_1, COMUNA_ORIGEN == indices$Comuna[i])$QUI010, na.rm = TRUE)
   IDP <- subset(indices, Comuna == indices$Comuna[i])$IDP
   IDC <- subset(indices, Comuna == indices$Comuna[i])$IDC
   RCP <- subset(indices, Comuna == indices$Comuna[i])$RCP
   PPC <- subset(indices, Comuna == indices$Comuna[i])$PPC
   row_index <- which(prom_com_valp$Comuna == indices$Comuna[i])
+  prom_com_valp[row_index, "FIS100"] <- as.numeric(FIS100)
+  prom_com_valp[row_index, "FIS110"] <- as.numeric(FIS110)
+  prom_com_valp[row_index, "IWI131"] <- as.numeric(IWI131)
+  prom_com_valp[row_index, "MAT021"] <- as.numeric(MAT021)
+  prom_com_valp[row_index, "MAT022"] <- as.numeric(MAT022)
+  prom_com_valp[row_index, "QUI010"] <- as.numeric(QUI010)
   prom_com_valp[row_index, "IDP"] <- as.numeric(IDP)
   prom_com_valp[row_index, "IDC"] <- as.numeric(IDC)
   prom_com_valp[row_index, "RCP"] <- as.numeric(RCP)
@@ -790,6 +801,12 @@ for (i in 1:length(indices$Comuna)){
 
 prom_com_valp <- prom_com_valp %>% mutate_all(~ifelse(is.nan(.), NA, .))
 
+gadm_valp_com$FIS100 <- prom_com_valp$FIS100
+gadm_valp_com$FIS110 <- prom_com_valp$FIS110
+gadm_valp_com$IWI131 <- prom_com_valp$IWI131
+gadm_valp_com$MAT021 <- prom_com_valp$MAT021
+gadm_valp_com$MAT022 <- prom_com_valp$MAT022
+gadm_valp_com$QUI010 <- prom_com_valp$QUI010
 gadm_valp_com$IDP <- prom_com_valp$IDP
 gadm_valp_com$IDC <- prom_com_valp$IDC
 gadm_valp_com$RCP <- prom_com_valp$RCP
@@ -911,7 +928,78 @@ map4
 :::
 :::
 
-HASTA ACA saksaksankasknsaknsa
+Mediante gráficos similares podemos visualizar las notas por semestre
+
+::: panelset
+<!-- IDP -->
+
+::: panel
+[MAT021 2017-1]{.panel-name}
+
+```{r, fig.align = "center", message=FALSE, warning=FALSE, echo=FALSE}
+
+colours <- colorNumeric(palette = "RdBu", domain = 0:100)
+map5 <- leaflet(data=gadm_valp_com) %>%
+        addTiles() %>%
+        addPolygons(fillColor = ~colours(MAT021), color="grey", weight=1,
+        fillOpacity = 0.7, 
+        label = ~paste(gadm_valp_com$NAME_3, gadm_valp_com$MAT021),
+        highlightOptions = highlightOptions(
+          weight = 5,
+          color = "grey",
+          fillOpacity = 0.7,
+          bringToFront = TRUE),
+        labelOptions = labelOptions(
+          style = list("font-weight" = "normal", padding = "3px 8px"),
+          textsize = "15px",
+          direction = "auto")) %>%
+        addLegend(pal = colours, values = gadm_valp_com$MAT021, opacity = 1,
+        title="MAT021") %>%
+        addScaleBar(position="bottomleft")
+map5
+
+```
+:::
+
+<!-- IDC -->
+
+::: panel
+[FIS100 2017-2]{.panel-name}
+
+```{r, fig.align="center", message=FALSE, warning=FALSE, echo=FALSE}
+
+colours <- colorNumeric(palette = "RdBu", domain = 0:100)
+map6 <- leaflet(data=gadm_valp_com) %>%
+        addTiles() %>%
+        addPolygons(fillColor = ~colours(FIS100), color="grey", weight=1,
+        fillOpacity = 0.7, 
+        label = ~paste(gadm_valp_com$NAME_3, gadm_valp_com$FIS100),
+        highlightOptions = highlightOptions(
+          weight = 5,
+          color = "grey",
+          fillOpacity = 0.7,
+          bringToFront = TRUE),
+        labelOptions = labelOptions(
+          style = list("font-weight" = "normal", padding = "3px 8px"),
+          textsize = "15px",
+          direction = "auto")) %>%
+        addLegend(pal = colours, values = gadm_valp_com$FIS100, opacity = 1,
+        title="FIS100") %>%
+        addScaleBar(position="bottomleft")
+map6
+
+```
+:::
+:::
+
+
+Ahora, el grafo formado por las comunas de la región que nos permitirá formar la matriz de contiguidad se presenta a continuación
+
+<center>
+
+![](grafo.png){width="463"}
+
+</center>
 
 ::: {#viz1674236998632 .tableauPlaceholder style="position: relative"}
 <noscript><a href='#'><img src="https://public.tableau.com/static/images/Ma/Mapas_16742364637680/Dashboard1/1_rss.png" alt="Dashboard 1 " style="border: none"/></a></noscript>
