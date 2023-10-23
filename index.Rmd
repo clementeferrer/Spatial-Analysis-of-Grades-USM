@@ -3,7 +3,7 @@ title: "Análisis espacial de calificaciones obtenidas durante la pandemia por
 estudiantes de primer año"
 lang: es
 author: "Clemente Ferrer"
-date: '23 de Enero del 2023'
+date: '23 de Octubre del 2023'
 output: 
   html_document:
     toc: true
